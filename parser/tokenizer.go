@@ -4,6 +4,7 @@ import (
 	"io"
 	"bufio"
 	"unicode"
+	"strings"
 )
 
 type EventHandler interface {
@@ -57,7 +58,7 @@ func (z *Tokenizer) literal() {
 		z.err(err)
 		return
 	}
-	z.event.Literal(str)
+	z.event.Literal(strings.TrimSuffix(str, "`"))
 }
 
 func (z *Tokenizer) dquote() {
@@ -66,7 +67,7 @@ func (z *Tokenizer) dquote() {
 		z.err(err)
 		return
 	}
-	z.event.Strval(str)
+	z.event.Strval(strings.TrimSuffix(str, `"`))
 }
 
 var (
@@ -88,7 +89,7 @@ func (z *Tokenizer) word(b rune) {
 			z.include()
 		} else {
 			z.input.UnreadRune()
-			z.bareword()
+			z.bareword(true)
 		}
 		return
 	case 'R': // ROUTE
@@ -97,7 +98,7 @@ func (z *Tokenizer) word(b rune) {
 			return
 		}
 
-		z.bareword()
+		z.bareword(true)
 		return
 
 	case 'U': // USING
@@ -105,24 +106,24 @@ func (z *Tokenizer) word(b rune) {
 			z.using()
 			return
 		}
-		z.bareword()
+		z.bareword(true)
 		return
 	case 'D': // DOES
 		if z.peekMatch(oes) {
 			z.does()
 			return
 		}
-		z.bareword()
+		z.bareword(true)
 		return
 	case 'F': // FROM
 		if z.peekMatch(rom) {
 			z.from()
 			return
 		}
-		z.bareword()
+		z.bareword(true)
 		return
 	default:
-		z.bareword()
+		z.bareword(true)
 	}
 }
 
@@ -140,7 +141,10 @@ func (z *Tokenizer) peekMatch(word string) bool {
 	return matches
 }
 
-func (z *Tokenizer) bareword() {
+func (z *Tokenizer) bareword(unread bool) {
+	if unread {
+		z.input.UnreadRune()
+	}
 	buf := []rune{}
 	r, _, err := z.input.ReadRune()
 	for {
