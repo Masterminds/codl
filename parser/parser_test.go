@@ -91,11 +91,22 @@ func TestParseSimpleRoutes(t *testing.T) {
 
 func TestParseFullRoute(t *testing.T) {
 	doc := `
+IMPORT github.com/Masterminds/codl
+
 ROUTE matt "Butcher"
 	DOES «foo.Bar» "foo"
 		USING "param1" "default value"
 		FROM cxt:query get:q
 		USING "param2" FROM cxt:p2
+
+ROUTE route2 "Another description"
+	DOES «foo.Baz» "baz"
+		USING "param1" USING param2 USING param3
+
+ROUTE route3 "Route Three"
+	INCLUDE one
+	INCLUDE two
+	DOES «three»
 		`
 
 	input := strings.NewReader(doc)
@@ -124,5 +135,13 @@ ROUTE matt "Butcher"
 	}
 	if handy.routes[0].commands[0].params[1].defval != "" {
 		t.Errorf("Expected second USING to have empty default value.")
+	}
+
+	// Test route 3
+	if handy.routes[2].commands[1].cmdType != cmdInclude {
+		t.Errorf("Expected 3rd command to have an INCLUDE in slot 2")
+	}
+	if handy.routes[2].commands[1].name !=  "`two`" {
+		t.Errorf("Expected 3rd command to be two, got %s", handy.routes[2].commands[1].name)
 	}
 }
