@@ -229,3 +229,7 @@ ROUTE foo bar
     USING foo bar
       FROM foo bar
 ```
+
+CODL does not care about your indentation practices. Use tabs. Use
+spaces. Use a carefully crafted sequence of carriage returns. And
+bikeshed away on which one is best.
