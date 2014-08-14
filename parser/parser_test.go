@@ -80,11 +80,11 @@ func TestParseSimpleRoutes(t *testing.T) {
 	descs := []string{"`bar`", "`BAR`", "", "`bar bar bar`"}
 
 	for i, name := range names {
-		if handy.routes[i].name != name {
-			t.Errorf("Expected name to be %s, got %s", name, handy.routes[i].name)
+		if handy.routes[i].Name != name {
+			t.Errorf("Expected name to be %s, got %s", name, handy.routes[i].Name)
 		}
-		if handy.routes[i].description != descs[i] {
-			t.Errorf("Expected name to be %s, got %s", descs[i], handy.routes[i].description)
+		if handy.routes[i].Description != descs[i] {
+			t.Errorf("Expected name to be %s, got %s", descs[i], handy.routes[i].Description)
 		}
 	}
 }
@@ -100,11 +100,11 @@ func TestParseRuleBreaker(t *testing.T) {
 
 	handy := h.(*handler)
 
-	if handy.routes[0].commands[0].name != "`thingy`" {
-		t.Errorf("Unexpected name: %s", handy.routes[0].commands[0].name)
+	if handy.routes[0].Commands[0].Name != "`thingy`" {
+		t.Errorf("Unexpected name: %s", handy.routes[0].Commands[0].Name)
 	}
-	if handy.routes[0].commands[0].cmd != "bare.Word" {
-		t.Errorf("Expected rule-breaker to be allowed: %s", handy.routes[0].commands[0].cmd)
+	if handy.routes[0].Commands[0].Cmd != "bare.Word" {
+		t.Errorf("Expected rule-breaker to be allowed: %s", handy.routes[0].Commands[0].Cmd)
 	}
 }
 
@@ -137,30 +137,30 @@ ROUTE route3 "Route Three"
 
 	handy := h.(*handler)
 
-	if handy.routes[0].name != "`matt`" {
+	if handy.routes[0].Name != "`matt`" {
 		t.Errorf("Expected `matt`")
 	}
-	if handy.routes[0].commands[0].name != "`foo`" {
+	if handy.routes[0].Commands[0].Name != "`foo`" {
 		t.Errorf("Expected first command to be named foo.")
 	}
-	if handy.routes[0].commands[0].cmd != "foo.Bar" {
+	if handy.routes[0].Commands[0].Cmd != "foo.Bar" {
 		t.Errorf("Expected first command to be foo.Bar.")
 	}
-	if handy.routes[0].commands[0].params[0].from[1] != "`get:q`" {
-		t.Errorf("Expected second FROM to be get:q")
+	if handy.routes[0].Commands[0].Params[0].From[1] != "`get:q`" {
+		t.Errorf("Expected second From to be get:q")
 	}
-	if handy.routes[0].commands[0].params[1].name != "`param2`" {
+	if handy.routes[0].Commands[0].Params[1].Name != "`param2`" {
 		t.Errorf("Expected second USING to be param2")
 	}
-	if handy.routes[0].commands[0].params[1].defval != "" {
+	if handy.routes[0].Commands[0].Params[1].DefaultVal != "" {
 		t.Errorf("Expected second USING to have empty default value.")
 	}
 
 	// Test route 3
-	if handy.routes[2].commands[1].cmdType != cmdInclude {
+	if handy.routes[2].Commands[1].cmdType != cmdInclude {
 		t.Errorf("Expected 3rd command to have an INCLUDES in slot 2")
 	}
-	if handy.routes[2].commands[1].name !=  "`two`" {
-		t.Errorf("Expected 3rd command to be two, got %s", handy.routes[2].commands[1].name)
+	if handy.routes[2].Commands[1].Name !=  "`two`" {
+		t.Errorf("Expected 3rd command to be two, got %s", handy.routes[2].Commands[1].Name)
 	}
 }

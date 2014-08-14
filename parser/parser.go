@@ -21,38 +21,38 @@ const (
 	cmdDoes
 )
 
-type using struct {
-	from []string
-	name, defval string
+type Using struct {
+	From []string
+	Name, DefaultVal string
 }
 
-type command struct {
+type Command struct {
 	cmdType int
-	name, cmd string
-	params []*using
-	currentParam *using
+	Name, Cmd string
+	Params []*Using
+	currentParam *Using
 }
 
-type route struct {
-	name, description string
-	commands []*command
-	currentCommand *command
+type Route struct {
+	Name, Description string
+	Commands []*Command
+	currentCommand *Command
 }
 
 type handler struct {
 	mode int
 	imports []string
-	routes []*route
+	routes []*Route
 	err error
 
-	currentRoute *route
+	currentRoute *Route
 }
 
 func Parse(input io.Reader) (EventHandler, error) {
 	l := &handler {
 		mode: TopMode,
 		imports: []string{},
-		routes: []*route{},
+		routes: []*Route{},
 	}
 	z := NewTokenizer(input, l)
 
@@ -65,6 +65,17 @@ func Parse(input io.Reader) (EventHandler, error) {
 	}
 
 	return l, nil
+}
+
+func (l *handler) Package() string {
+	return "routes"
+}
+
+func (l *handler) Routes() []*Route {
+	return l.routes
+}
+func (l *handler) Imports() []string {
+	return l.imports
 }
 
 func (l *handler) Err() error {
@@ -81,22 +92,22 @@ func (l *handler) Literal(str string) {
 		l.err = fmt.Errorf("Literals are only allowed in DOES and USING: %s", str)
 	case DoesMode:
 		cc := l.currentRoute.currentCommand
-		if len(cc.cmd) > 0 {
-			l.err = fmt.Errorf("DOES %s already has a command.", cc.name)
+		if len(cc.Cmd) > 0 {
+			l.err = fmt.Errorf("DOES %s already has a command.", cc.Name)
 			return
 		}
-		cc.cmd = str
+		cc.Cmd = str
 	case UsingMode:
 		cc := l.currentRoute.currentCommand
 		// In Using mode, we can take a default that is a literal.
-		if len(cc.currentParam.name) == 0 {
+		if len(cc.currentParam.Name) == 0 {
 			l.err = fmt.Errorf("USING requires a name that is not a literal.")
 			return
-		} else if len(cc.currentParam.defval) > 0 {
+		} else if len(cc.currentParam.DefaultVal) > 0 {
 			l.err = fmt.Errorf("USING only allows one default value")
 			return
 		}
-		cc.currentParam.defval = str
+		cc.currentParam.DefaultVal = str
 	}
 }
 func (l *handler) Strval(str string){
@@ -110,43 +121,43 @@ func (l *handler) Strval(str string){
 	case ImportMode:
 		l.imports = append(l.imports, str)
 	case RouteMode:
-		if len(l.currentRoute.name) == 0 {
-			l.currentRoute.name = str
-		} else if len(l.currentRoute.description) == 0 {
-			l.currentRoute.description = str
+		if len(l.currentRoute.Name) == 0 {
+			l.currentRoute.Name = str
+		} else if len(l.currentRoute.Description) == 0 {
+			l.currentRoute.Description = str
 		} else {
 			l.err = fmt.Errorf("ROUTE takes one name and one description. No place for %s", str)
 		}
 	case IncludeMode:
-		if len(l.currentRoute.currentCommand.name) > 0 {
+		if len(l.currentRoute.currentCommand.Name) > 0 {
 			fmt.Errorf("INCLUDE takes only one string. No place for %s", str)
 			return
 		}
-		l.currentRoute.currentCommand.name = str
+		l.currentRoute.currentCommand.Name = str
 	case DoesMode:
-		if len(l.currentRoute.currentCommand.cmd) == 0 {
+		if len(l.currentRoute.currentCommand.Cmd) == 0 {
 			// We're gonna strategically ignore this rule. For pragmatic reasons,
 			// it's a better user experience to "pretend" this string is a literal.
 			//l.err = fmt.Errorf("DOES requires a `literal` for a command, not a string %s.", str)
 			//fmt.Printf("Got a str for a command: %s\n", orig)
-			l.currentRoute.currentCommand.cmd = orig
-		} else if len(l.currentRoute.currentCommand.name) == 0 {
-			l.currentRoute.currentCommand.name = str
+			l.currentRoute.currentCommand.Cmd = orig
+		} else if len(l.currentRoute.currentCommand.Name) == 0 {
+			l.currentRoute.currentCommand.Name = str
 		} else {
 			l.err = fmt.Errorf("DOES takes one literal and one string. No place for %s", str)
 		}
 	case UsingMode:
 		cp := l.currentRoute.currentCommand.currentParam
-		if len(cp.name) == 0 {
-			cp.name = str
-		} else if len(cp.defval) == 0 {
-			cp.defval = str
+		if len(cp.Name) == 0 {
+			cp.Name = str
+		} else if len(cp.DefaultVal) == 0 {
+			cp.DefaultVal = str
 		} else {
 			l.err = fmt.Errorf("USING takes one literal and one string or literal. No place for %s", str)
 		}
 	case FromMode:
 		cp := l.currentRoute.currentCommand.currentParam
-		cp.from = append(cp.from, str)
+		cp.From = append(cp.From, str)
 	}
 
 }
@@ -169,17 +180,17 @@ func (l *handler) Includes(){
 		l.err = fmt.Errorf("INCLUDE is only allowed inside of a ROUTE")
 	//case RouteMode, UsingMode, DoesMode, FromMode, IncludeMode:
 	default:
-		c := &command{ cmdType: cmdInclude }
+		c := &Command{ cmdType: cmdInclude }
 		l.mode = IncludeMode
 		l.currentRoute.currentCommand = c
-		l.currentRoute.commands = append(l.currentRoute.commands, c)
+		l.currentRoute.Commands = append(l.currentRoute.Commands, c)
 	}
 }
 
 func (l *handler) Route(){
 	// No modes override this.
 	l.mode = RouteMode
-	r := new(route)
+	r := new(Route)
 	l.currentRoute = r
 	l.routes = append(l.routes, r)
 }
@@ -189,10 +200,10 @@ func (l *handler) Using() {
 	case TopMode, ImportMode, IncludeMode, RouteMode:
 		l.err = fmt.Errorf("USING is only allowed inside of a DOES")
 	case DoesMode, UsingMode, FromMode:
-		u := new(using)
+		u := new(Using)
 		cc := l.currentRoute.currentCommand
 		cc.currentParam = u
-		cc.params = append(cc.params, u)
+		cc.Params = append(cc.Params, u)
 		l.mode = UsingMode
 	}
 }
@@ -203,8 +214,8 @@ func (l *handler) Does(){
 		l.err = fmt.Errorf("DOES can only appear inside of a ROUTE.")
 	default:
 		l.mode = DoesMode
-		c := new(command)
-		l.currentRoute.commands = append(l.currentRoute.commands, c)
+		c := new(Command)
+		l.currentRoute.Commands = append(l.currentRoute.Commands, c)
 		l.currentRoute.currentCommand = c
 	}
 }

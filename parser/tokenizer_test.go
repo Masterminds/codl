@@ -84,9 +84,7 @@ func TestKeywords(t *testing.T) {
 		"USING":"_USING",
 		"DOES": "_DOES",
 		"FROM": "_FROM",
-
 		"        FROM": "_FROM",
-
 		"IMPORTs": "IMPORTs", // This should be interpreted as a string.
 		"FROMs": "FROMs", // This should be interpreted as a string.
 		"DOE": "DOE", // This should be interpreted as a string.
