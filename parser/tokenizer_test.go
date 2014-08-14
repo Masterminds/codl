@@ -54,7 +54,7 @@ func TestStrings(t *testing.T) {
 	// Third: code literals
 	// Second: barewords
 	expect = "this is code"
-	wrapped = "`" + expect + "`"
+	wrapped = "«" + expect + "»"
 	r = strings.NewReader(wrapped)
 	z = NewTokenizer(r, l)
 

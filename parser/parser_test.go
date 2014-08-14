@@ -92,7 +92,7 @@ func TestParseSimpleRoutes(t *testing.T) {
 func TestParseFullRoute(t *testing.T) {
 	doc := `
 ROUTE matt "Butcher"
-	DOES ` + "`foo.Bar`" + ` "foo"
+	DOES «foo.Bar» "foo"
 		USING "param1" "default value"
 		FROM cxt:query get:q
 		USING "param2" FROM cxt:p2

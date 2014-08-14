@@ -38,8 +38,12 @@ func (z *Tokenizer) Next() {
 	switch b {
 	case '`':
 		z.literal()
+	case '«':
+		z.altLiteral()
 	case '"':
 		z.dquote()
+	case '\'':
+		z.squote()
 	//case ' ', '\t', '\n', '\r', '\v', '\f', 0x85 /* NEL */, 0xA0 /* NBSP */:
 		// consume whitespace.
 	default:
@@ -60,6 +64,14 @@ func (z *Tokenizer) literal() {
 	}
 	z.event.Literal(strings.TrimSuffix(str, "`"))
 }
+func (z *Tokenizer) altLiteral() {
+	str, err := z.input.ReadString('»')
+	if err != nil {
+		z.err(err)
+		return
+	}
+	z.event.Literal(strings.TrimSuffix(str, "»"))
+}
 
 func (z *Tokenizer) dquote() {
 	str, err := z.input.ReadString('"')
@@ -68,6 +80,14 @@ func (z *Tokenizer) dquote() {
 		return
 	}
 	z.event.Strval(strings.TrimSuffix(str, `"`))
+}
+func (z *Tokenizer) squote() {
+	str, err := z.input.ReadString('"')
+	if err != nil {
+		z.err(err)
+		return
+	}
+	z.event.Strval(strings.TrimSuffix(str, `'`))
 }
 
 var (
@@ -213,23 +233,4 @@ func NewTokenizer(input io.Reader, e EventHandler) *Tokenizer {
 
 	return &z
 }
-
-/*
-func Parse(input io.Reader, e EventHandler) error {
-	z := NewTokenizer(input, e)
-
-	for z.lastErr != nil {
-
-		// Advance
-		z.Next()
-
-	}
-
-	if z.lastErr == io.EOF {
-		return nil
-	}
-
-	return z.lastErr
-}
-*/
 
