@@ -128,7 +128,7 @@ func (l *handler) Strval(str string){
 		} else if len(l.currentRoute.currentCommand.name) == 0 {
 			l.currentRoute.currentCommand.name = str
 		} else {
-			l.err = fmt.Errorf("DOES takes on literal and one string. No place for %s", str)
+			l.err = fmt.Errorf("DOES takes one literal and one string. No place for %s", str)
 		}
 	case UsingMode:
 		cp := l.currentRoute.currentCommand.currentParam
