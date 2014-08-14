@@ -214,6 +214,7 @@ func NewTokenizer(input io.Reader, e EventHandler) *Tokenizer {
 	return &z
 }
 
+/*
 func Parse(input io.Reader, e EventHandler) error {
 	z := NewTokenizer(input, e)
 
@@ -230,4 +231,5 @@ func Parse(input io.Reader, e EventHandler) error {
 
 	return z.lastErr
 }
+*/
 

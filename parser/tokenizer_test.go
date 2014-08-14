@@ -37,8 +37,8 @@ func TestStrings(t *testing.T) {
 	z := NewTokenizer(r, l)
 
 	z.Next()
-	if l.last.(string) != expect {
-		t.Errorf("Expected '%s', got '%s'", expect, l.last.(string))
+	if l.last != expect {
+		t.Errorf("Expected '%s', got '%s'", expect, l.last)
 	}
 
 	// Second: barewords
@@ -47,8 +47,8 @@ func TestStrings(t *testing.T) {
 	z = NewTokenizer(r, l)
 
 	z.Next()
-	if l.last.(string) != expect {
-		t.Errorf("Expected '%s', got '%s'", expect, l.last.(string))
+	if l.last != expect {
+		t.Errorf("Expected '%s', got '%s'", expect, l.last)
 	}
 
 	// Third: code literals
@@ -59,14 +59,38 @@ func TestStrings(t *testing.T) {
 	z = NewTokenizer(r, l)
 
 	z.Next()
-	if l.last.(string) != expect {
-		t.Errorf("Expected '%s', got '%s'", expect, l.last.(string))
+	if l.last != expect {
+		t.Errorf("Expected '%s', got '%s'", expect, l.last)
+	}
+
+}
+
+func TestKeywords(t *testing.T) {
+
+	expectMap := map[string]string {
+		"IMPORT": "_IMPORT",
+		"INCLUDE": "_INCLUDE",
+		"ROUTE": "_ROUTE",
+		"USING":"_USING",
+		"DOES": "_DOES",
+		"FROM": "_FROM",
+	}
+
+	for input, output := range expectMap {
+		r := strings.NewReader(input)
+		l := new(ListenerFixture)
+		z := NewTokenizer(r, l)
+		z.Next()
+
+		if output != l.last {
+			t.Errorf("Expected '%s', but got '%s'", output, l.last)
+		}
 	}
 
 }
 
 type ListenerFixture struct {
-	last interface{}
+	last string
 	err error
 }
 
@@ -79,9 +103,21 @@ func (l *ListenerFixture) Literal(str string){
 func (l *ListenerFixture) Strval(str string){
 	l.last = str
 }
-func (l *ListenerFixture) Import(){}
-func (l *ListenerFixture) Include(){}
-func (l *ListenerFixture) Route(){}
-func (l *ListenerFixture) Using(){}
-func (l *ListenerFixture) Does(){}
-func (l *ListenerFixture) From(){}
+func (l *ListenerFixture) Import(){
+	l.last = "_IMPORT"
+}
+func (l *ListenerFixture) Include(){
+	l.last = "_INCLUDE"
+}
+func (l *ListenerFixture) Route(){
+	l.last = "_ROUTE"
+}
+func (l *ListenerFixture) Using(){
+	l.last = "_USING"
+}
+func (l *ListenerFixture) Does(){
+	l.last = "_DOES"
+}
+func (l *ListenerFixture) From(){
+	l.last = "_FROM"
+}
