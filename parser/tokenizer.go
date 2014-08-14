@@ -2,6 +2,7 @@ package parser
 
 import (
 	"io"
+	"fmt"
 	"bufio"
 	"unicode"
 	"strings"
@@ -105,12 +106,13 @@ func (z *Tokenizer) word(b rune) {
 	case 'I':
 		if z.peekMatch(mport) {
 			z.imports()
+			return
 		} else if z.peekMatch(nclude) {
 			z.include()
-		} else {
-			z.input.UnreadRune()
-			z.bareword(true)
+			return
 		}
+		//z.input.UnreadRune()
+		z.bareword([]rune{b})
 		return
 	case 'R': // ROUTE
 		if z.peekMatch(oute) {
@@ -118,7 +120,7 @@ func (z *Tokenizer) word(b rune) {
 			return
 		}
 
-		z.bareword(true)
+		z.bareword([]rune{b})
 		return
 
 	case 'U': // USING
@@ -126,31 +128,38 @@ func (z *Tokenizer) word(b rune) {
 			z.using()
 			return
 		}
-		z.bareword(true)
+		z.bareword([]rune{b})
 		return
 	case 'D': // DOES
 		if z.peekMatch(oes) {
 			z.does()
 			return
 		}
-		z.bareword(true)
+		z.bareword([]rune{b})
 		return
 	case 'F': // FROM
 		if z.peekMatch(rom) {
 			z.from()
 			return
 		}
-		z.bareword(true)
+		z.bareword([]rune{b})
 		return
 	default:
-		z.bareword(true)
+		z.bareword([]rune{b})
 	}
 }
 
 func (z *Tokenizer) peekMatch(word string) bool {
 	size := len(word)
-	p, err := z.input.Peek(size)
-	matches := err == nil && string(p) == word
+	p, err := z.input.Peek(size + 1)
+	if err != nil && err != io.EOF {
+		fmt.Printf("Received peek error. Please report: %s\n", err)
+	}
+	matches := len(p) >= size && string(p[0:size]) == word
+
+	if len(p) == size + 1 && !unicode.IsSpace(rune(p[size])) {
+		return false
+	}
 
 	if matches {
 		// throw-away buffer.
@@ -161,11 +170,15 @@ func (z *Tokenizer) peekMatch(word string) bool {
 	return matches
 }
 
-func (z *Tokenizer) bareword(unread bool) {
+func (z *Tokenizer) bareword(prepend []rune) {
+	/*
 	if unread {
-		z.input.UnreadRune()
+		if err := z.input.UnreadRune(); err != nil {
+			fmt.Printf("Error unreading: %s\n", err)
+		}
 	}
-	buf := []rune{}
+	*/
+	buf := prepend
 	r, _, err := z.input.ReadRune()
 	for {
 		if err != nil {
