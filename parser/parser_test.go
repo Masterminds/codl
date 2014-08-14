@@ -89,6 +89,25 @@ func TestParseSimpleRoutes(t *testing.T) {
 	}
 }
 
+func TestParseRuleBreaker(t *testing.T) {
+	doc := `ROUTE foo DOES bare.Word thingy`
+	input := strings.NewReader(doc)
+
+	h, err := Parse(input)
+	if err != nil {
+		t.Errorf("Surprise! Error: %s", err)
+	}
+
+	handy := h.(*handler)
+
+	if handy.routes[0].commands[0].name != "`thingy`" {
+		t.Errorf("Unexpected name: %s", handy.routes[0].commands[0].name)
+	}
+	if handy.routes[0].commands[0].cmd != "bare.Word" {
+		t.Errorf("Expected rule-breaker to be allowed: %s", handy.routes[0].commands[0].cmd)
+	}
+}
+
 func TestParseFullRoute(t *testing.T) {
 	doc := `
 IMPORT github.com/Masterminds/codl

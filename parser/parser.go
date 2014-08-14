@@ -100,6 +100,7 @@ func (l *handler) Literal(str string) {
 	}
 }
 func (l *handler) Strval(str string){
+	orig := str
 
 	str = asString(str)
 
@@ -124,7 +125,11 @@ func (l *handler) Strval(str string){
 		l.currentRoute.currentCommand.name = str
 	case DoesMode:
 		if len(l.currentRoute.currentCommand.cmd) == 0 {
-			l.err = fmt.Errorf("DOES requires a `literal` for a command, not a string %s.", str)
+			// We're gonna strategically ignore this rule. For pragmatic reasons,
+			// it's a better user experience to "pretend" this string is a literal.
+			//l.err = fmt.Errorf("DOES requires a `literal` for a command, not a string %s.", str)
+			//fmt.Printf("Got a str for a command: %s\n", orig)
+			l.currentRoute.currentCommand.cmd = orig
 		} else if len(l.currentRoute.currentCommand.name) == 0 {
 			l.currentRoute.currentCommand.name = str
 		} else {
