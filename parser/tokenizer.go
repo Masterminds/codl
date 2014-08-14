@@ -13,7 +13,7 @@ type EventHandler interface {
 	Strval(string)
 
 	Import()
-	Include()
+	Includes()
 	Route()
 	Using()
 	Does()
@@ -92,7 +92,7 @@ func (z *Tokenizer) squote() {
 
 var (
 	mport = "MPORT"
-	nclude = "NCLUDE"
+	nclude = "NCLUDES"
 	oute = "OUTE"
 	sing = "SING"
 	rom = "ROM"
@@ -205,7 +205,7 @@ func (z *Tokenizer) imports() {
 }
 
 func (z *Tokenizer) include() {
-	z.event.Include()
+	z.event.Includes()
 }
 
 func (z *Tokenizer) from() {

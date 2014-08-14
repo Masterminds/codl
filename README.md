@@ -9,7 +9,7 @@ Here is a basic example of the syntax:
 IMPORT "foo/some"
 
 ROUTE "name" "Description"
-  DOES some.Command "name"
+  DOES `some.Command` "name"
     USING "paramName" "Optional default" FROM cxt:foo post:bar
 ```
 

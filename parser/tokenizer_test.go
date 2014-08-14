@@ -52,7 +52,17 @@ func TestStrings(t *testing.T) {
 	}
 
 	// Third: code literals
-	// Second: barewords
+	expect = "this is code"
+	wrapped = "`" + expect + "`"
+	r = strings.NewReader(wrapped)
+	z = NewTokenizer(r, l)
+
+	z.Next()
+	if l.last != expect {
+		t.Errorf("Expected '%s', got '%s'", expect, l.last)
+	}
+
+	// Alternate code literals
 	expect = "this is code"
 	wrapped = "«" + expect + "»"
 	r = strings.NewReader(wrapped)
@@ -69,7 +79,7 @@ func TestKeywords(t *testing.T) {
 
 	expectMap := map[string]string {
 		"IMPORT": "_IMPORT",
-		"INCLUDE": "_INCLUDE",
+		"INCLUDES": "_INCLUDES",
 		"ROUTE": "_ROUTE",
 		"USING":"_USING",
 		"DOES": "_DOES",
@@ -106,8 +116,8 @@ func (l *ListenerFixture) Strval(str string){
 func (l *ListenerFixture) Import(){
 	l.last = "_IMPORT"
 }
-func (l *ListenerFixture) Include(){
-	l.last = "_INCLUDE"
+func (l *ListenerFixture) Includes(){
+	l.last = "_INCLUDES"
 }
 func (l *ListenerFixture) Route(){
 	l.last = "_ROUTE"

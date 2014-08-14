@@ -158,7 +158,7 @@ func (l *handler) Import(){
 
 	l.mode = ImportMode
 }
-func (l *handler) Include(){
+func (l *handler) Includes(){
 	switch l.mode {
 	case TopMode, ImportMode:
 		l.err = fmt.Errorf("INCLUDE is only allowed inside of a ROUTE")

@@ -104,8 +104,8 @@ ROUTE route2 "Another description"
 		USING "param1" USING param2 USING param3
 
 ROUTE route3 "Route Three"
-	INCLUDE one
-	INCLUDE two
+	INCLUDES one
+	INCLUDES two
 	DOES «three»
 		`
 
@@ -139,7 +139,7 @@ ROUTE route3 "Route Three"
 
 	// Test route 3
 	if handy.routes[2].commands[1].cmdType != cmdInclude {
-		t.Errorf("Expected 3rd command to have an INCLUDE in slot 2")
+		t.Errorf("Expected 3rd command to have an INCLUDES in slot 2")
 	}
 	if handy.routes[2].commands[1].name !=  "`two`" {
 		t.Errorf("Expected 3rd command to be two, got %s", handy.routes[2].commands[1].name)
