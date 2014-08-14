@@ -12,15 +12,13 @@ Here is a basic example of the syntax:
 
 ```
 IMPORT
-		github.com/Masterminds/cookoo/web
-		github.com/Masterminds/cookoo/cli
+	github.com/Masterminds/cookoo/web
+	github.com/Masterminds/cookoo/cli
 
 ROUTE "test" "This is a test route."
   DOES web.Flush "first"
     USING p1 "This is a default value"
-     FROM cxt:p1 cxt:p2
-    USING p2 `1`
-     FROM cxt:p2
+    USING p2 `1` FROM cxt:p2
   DOES cli.ParseArgs "CMD"
 
 ROUTE "foo" "This is another route"
@@ -33,12 +31,12 @@ ROUTE "foo" "This is another route"
 CODL provides the following commands. *Case is important!* These MUST be
 in all caps.
 
-- IMPORT: Import one or more Go packages.
-- ROUTE: Add a new route
-- DOES: Add a command to a route
-- USING: Set a parameter on a command, and optionally set a default
-- FROM: Pass a value into a parameter on a command
-- INCLUDES: Include another route in the present route.
+- `IMPORT`: Import one or more Go packages.
+- `ROUTE`: Add a new route
+- `DOES`: Add a command to a route
+- `USING`: Set a parameter on a command, and optionally set a default
+- `FROM`: Pass a value into a parameter on a command
+- `INCLUDES`: Include another route in the present route.
 
 CODL cannot tell bare words (see below) from statements. So if you need
 to use a string that exactly matches a statement name, make sure you
@@ -216,3 +214,18 @@ reg.Route("b", "Second route includes first").
 
 As a general rule of thumb, you should always declare a route before
 including it elsewhere (though honestly CODL doesn't care).
+
+## Whitespace
+
+Outside of strings, CODL treats whitespace as significant only as a
+separator.
+
+Thus, `ROUTE foo bar DOES foo bar USING foo bar FROM foo bar` is treated as
+semantically identical to:
+
+```
+ROUTE foo bar
+  DOES foo bar
+    USING foo bar
+      FROM foo bar
+```
