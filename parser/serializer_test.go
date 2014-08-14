@@ -7,13 +7,17 @@ import (
 )
 
 func TestSerialize(t *testing.T) {
-	doc := `IMPORT foo bar baz
+	doc := `IMPORT
+		github.com/Masterminds/cookoo/web
+		github.com/Masterminds/cookoo/cli
+
 	ROUTE "test" "TEST"
-		DOES cmd1 "first"
-			USING p1 defval FROM cxt:p1
-			USING p2 defval2 FROM cxt:p2
-		DOES cmd2 "second"
-	ROUTE "foo" "BAR"`
+		DOES web.Flush "first"
+			USING p1 defval FROM cxt:p1 cxt:p2
+			USING p2 «1» FROM cxt:p2
+		DOES cli.ParseArgs "CMD"
+	ROUTE "foo" "BAR"
+		DOES web.Flush cmd3`
 	input := strings.NewReader(doc)
 
 	h, err := Parse(input)
@@ -22,7 +26,7 @@ func TestSerialize(t *testing.T) {
 	}
 
 	reg := h.(Registry)
-	ser := NewSerializer(os.Stdout, reg)
+	ser := NewSerializer("test", os.Stdout, reg)
 	if err := ser.Write(); err != nil {
 		t.Errorf("Failed to serialize: %s", err)
 	}

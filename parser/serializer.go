@@ -12,39 +12,51 @@ const bodyTpl = `package {{.Package}}
 
 import (
 	"github.com/Masterminds/cookoo"
-	{{range .Imports}}{{.}}
+	{{range .Registry.Imports}}{{.}}
 	{{end}}
 )
 
-func {{.Package | title }}Routes(reg *cookoo.Registry) {
-	{{range .Routes}}reg.Route({{.Name}}, {{.Description}}){{range .Commands}}.
+func {{.Name | title }}Routes(reg *cookoo.Registry) {
+	{{range .Registry.Routes}}reg.Route({{.Name}}, {{.Description}}){{range .Commands}}.
 		Does({{.Cmd}}, {{.Name}}){{range .Params}}.
-			Using({{.Name}}){{if .DefaultVal}}.WithDefault({{.DefaultVal}}){{end}}{{if .From}}.From({{.From}}){{end}}{{end}}{{end}}
+			Using({{.Name}}){{if .DefaultVal}}.WithDefault({{.DefaultVal}}){{end}}{{if .From}}.From({{.From | join ", "}}){{end}}{{end}}{{end}}
+
 	{{end}}
 }
 `
 
 type Registry interface {
-	Package() string
 	Routes() []*Route
 	Imports() []string
+}
+
+type serializerContext struct {
+	Registry Registry
+	Package string
+	Name string
 }
 
 type Serializer struct {
 	out io.Writer
 	reg Registry
 	tpl *template.Template
+	name string
 }
 
-func NewSerializer(out io.Writer, reg Registry) *Serializer {
-	s := &Serializer{out: out, reg: reg}
+func NewSerializer(name string, out io.Writer, reg Registry) *Serializer {
+	s := &Serializer{name: name, out: out, reg: reg}
 	s.compile()
 
 	return s
 }
 
 func (s *Serializer) Write() error {
-	return s.tpl.Execute(s.out, s.reg)
+	cxt := &serializerContext {
+		Name: s.name,
+		Registry: s.reg,
+		Package: "routes",
+	}
+	return s.tpl.Execute(s.out, cxt)
 }
 
 func (s *Serializer) compile() {
