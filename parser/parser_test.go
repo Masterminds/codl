@@ -110,9 +110,11 @@ func TestParseRuleBreaker(t *testing.T) {
 
 func TestParseFullRoute(t *testing.T) {
 	doc := `
+// Import codl
 IMPORT github.com/Masterminds/codl
 
-ROUTE matt "Butcher"
+// First route.
+ROUTE matt "Butcher" // That's my name!
 	DOES «foo.Bar» "foo"
 		USING "param1" "default value"
 		FROM cxt:query get:q

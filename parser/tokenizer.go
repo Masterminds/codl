@@ -4,6 +4,7 @@ import (
 	"io"
 	"fmt"
 	"bufio"
+	"bytes"
 	"unicode"
 	"strings"
 )
@@ -29,6 +30,7 @@ type Tokenizer struct {
 
 func (z *Tokenizer) Next() {
 	z.consumeSpace()
+	z.consumeComment()
 
 	b, _, err := z.input.ReadRune()
 	if err != nil {
@@ -75,20 +77,49 @@ func (z *Tokenizer) altLiteral() {
 }
 
 func (z *Tokenizer) dquote() {
-	str, err := z.input.ReadString('"')
+	str, err := z.readUntil('"')
+	//str, err := z.input.ReadString('"')
 	if err != nil {
 		z.err(err)
 		return
 	}
-	z.event.Strval(strings.TrimSuffix(str, `"`))
+	//z.event.Strval(strings.TrimSuffix(str, `"`))
+	z.event.Strval(str)
 }
 func (z *Tokenizer) squote() {
-	str, err := z.input.ReadString('"')
+	/*
+	str, err := z.input.ReadString('\'')
 	if err != nil {
 		z.err(err)
 		return
 	}
-	z.event.Strval(strings.TrimSuffix(str, `'`))
+	*/
+	str, err := z.readUntil('\'')
+	if err != nil {
+		z.err(err)
+		return
+	}
+	//z.event.Strval(strings.TrimSuffix(str, `'`))
+	z.event.Strval(str)
+}
+
+func (z *Tokenizer) readUntil(delim rune) (string, error) {
+	r, _, err := z.input.ReadRune()
+	skipNext := false
+	var b bytes.Buffer
+	for err == nil {
+		if r == delim && !skipNext {
+			return b.String(), nil
+		} else if r == '\\' {
+			// Strip the slashes.
+			skipNext = true
+		} else {
+			skipNext = false
+			b.WriteRune(r)
+		}
+		r, _, err = z.input.ReadRune()
+	}
+	return b.String(), err
 }
 
 var (
@@ -211,6 +242,14 @@ func (z *Tokenizer) consumeSpace() {
 		}
 		r, _, err = z.input.ReadRune()
 	}
+}
+
+func (z *Tokenizer) consumeComment() {
+	cmt, err := z.input.Peek(2)
+	if err == nil && string(cmt) == "//" {
+		_, err = z.input.ReadString('\n')
+	}
+	z.consumeSpace()
 }
 
 func (z *Tokenizer) imports() {

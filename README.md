@@ -73,6 +73,11 @@ closing quotation mark.
 "And it's okay to do this."
 
 "©ƒ†ç˚ˆ˙"
+
+// Backslashes are escapes in double- and single-quotes.
+"That\'s it!" // Becomes "That's it!"
+
+"Double\\backslash" // Becomes "Double\backslash"
 ```
 
 ### Bare Words
@@ -233,3 +238,44 @@ ROUTE foo bar
 CODL does not care about your indentation practices. Use tabs. Use
 spaces. Use a carefully crafted sequence of carriage returns. And
 bikeshed away on which one is best.
+
+## Comments
+
+There is one style of comment in CODL files: `//`. A comment extends
+from `//` to the end of the line (`\n`).
+
+Example:
+
+```
+// Do imports
+IMPORT foo // That's foo.
+```
+
+There is one **important** exception for comments. Because slashes
+appear frequently in URLs and paths, a comment cannot be immediately
+adjacent to a bare word:
+
+```
+ROUTE name description//foo
+```
+
+In the above, `description//foo` will be treated as one string. This is
+very useful for cases like this:
+
+```
+USES url http://example.com
+```
+
+As a result of this, attempting to start a comment immediately adjacent
+to a keyword is likely to cause a parse error:
+
+```
+// Bad.
+IMPORTS//comment
+IMPORTS// comment
+
+// Good.
+IMPORTS //comment
+IMPORTS // comment
+```
+

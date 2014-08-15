@@ -28,51 +28,55 @@ func TestMainLoop(t *testing.T) {
 
 func TestStrings(t *testing.T) {
 
-	expect := "this is a string"
-	wrapped := `"` + expect + `"`
+	expects := map[string]string {
+		`"Hello"`: "Hello",
+		`'Hello World'`: "Hello World",
+		"bareword": "bareword",
 
-	// First: quoted strings
-	r := strings.NewReader(wrapped)
-	l := new(ListenerFixture)
-	z := NewTokenizer(r, l)
+		`«literal code»`: "literal code",
+		"`literal two`": "literal two",
+		"˙¥®ƒ˙":"˙¥®ƒ˙",
 
-	z.Next()
-	if l.last != expect {
-		t.Errorf("Expected '%s', got '%s'", expect, l.last)
+		`"That's all folks"`: "That's all folks",
+		`"She said, \"hi\"."`: `She said, "hi".`,
 	}
 
-	// Second: barewords
-	expect = "bareword"
-	r = strings.NewReader(expect)
-	z = NewTokenizer(r, l)
+	for wrapped, expect := range expects {
 
-	z.Next()
-	if l.last != expect {
-		t.Errorf("Expected '%s', got '%s'", expect, l.last)
+		// First: quoted strings
+		r := strings.NewReader(wrapped)
+		l := new(ListenerFixture)
+		z := NewTokenizer(r, l)
+
+		z.Next()
+		if l.last != expect {
+			t.Errorf("Expected '%s', got '%s'", expect, l.last)
+		}
+		if l.err != nil && l.err != io.EOF {
+			t.Errorf("Unexpected error: %s", l.err)
+		}
 	}
 
-	// Third: code literals
-	expect = "this is code"
-	wrapped = "`" + expect + "`"
-	r = strings.NewReader(wrapped)
-	z = NewTokenizer(r, l)
+}
 
-	z.Next()
-	if l.last != expect {
-		t.Errorf("Expected '%s', got '%s'", expect, l.last)
+func TestComments(t *testing.T) {
+	expectMap := map[string]string {
+		"// Comment": "",
+		"test //comment": "test",
+		"//comment      \ntest": "test",
+		"http://foo": "http://foo",
 	}
 
-	// Alternate code literals
-	expect = "this is code"
-	wrapped = "«" + expect + "»"
-	r = strings.NewReader(wrapped)
-	z = NewTokenizer(r, l)
+	for input, output := range expectMap {
+		r := strings.NewReader(input)
+		l := new(ListenerFixture)
+		z := NewTokenizer(r, l)
+		z.Next()
 
-	z.Next()
-	if l.last != expect {
-		t.Errorf("Expected '%s', got '%s'", expect, l.last)
+		if output != l.last {
+			t.Errorf("Expected '%s', but got '%s'", output, l.last)
+		}
 	}
-
 }
 
 func TestKeywords(t *testing.T) {
