@@ -11,7 +11,7 @@ import (
 func FindCodl(c cookoo.Context, p *cookoo.Params) (interface{}, cookoo.Interrupt) {
 	dir := cookoo.GetString("dir", ".", p)
 
-	where := filepath.Join(dir, "*.go")
+	where := filepath.Join(dir, "*.codl")
 	files, err := filepath.Glob(where)
 
 	return files, err
