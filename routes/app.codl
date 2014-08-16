@@ -1,0 +1,7 @@
+// The main codl routes for codl.
+IMPORT
+  // github.com/Masterminds/cookoo/cli
+  github.com/Masterminds/codl/cmd
+
+ROUTE build "Build all CODL files in the given directory"
+  DOES cmd.FindCodl files
