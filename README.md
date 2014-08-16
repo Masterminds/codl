@@ -6,6 +6,35 @@ routes. It is designed to feel like SQL and read like English.
 Like SASS, Thrift, and other similar DSLs, CODL files are transformed
 into code (Go code, in this case) prior to compile time.
 
+This package contains the library for parsing CODL, as well as the
+`codl` command line client.
+
+## Installing
+
+Quick:
+
+```
+go install github.com/Masterminds/codl
+```
+
+For Developers:
+
+We use [glide](https://github.com/Masterminds/glide) to manage
+dependencies.
+
+```
+$ go get github.com/Masterminds/codl
+$ cd codl
+$ glide install && glide in
+```
+
+## Usage
+
+```
+$ codl help  # Show help text
+$ codl build # Transform all *.codl files into *.go files
+```
+
 ## Syntax
 
 Here is a basic example of the syntax:
