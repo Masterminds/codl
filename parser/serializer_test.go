@@ -26,7 +26,7 @@ func TestSerialize(t *testing.T) {
 	}
 
 	reg := h.(Registry)
-	ser := NewSerializer("test", os.Stdout, reg)
+	ser := NewSerializer("test", "serializertest", os.Stdout, reg)
 	if err := ser.Write(); err != nil {
 		t.Errorf("Failed to serialize: %s", err)
 	}

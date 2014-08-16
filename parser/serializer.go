@@ -41,10 +41,15 @@ type Serializer struct {
 	reg Registry
 	tpl *template.Template
 	name string
+	packageName string
 }
 
-func NewSerializer(name string, out io.Writer, reg Registry) *Serializer {
-	s := &Serializer{name: name, out: out, reg: reg}
+// NewSerializer creates a new serializer.
+//
+// name is used to construct the function callback. "foo" becomes "func FooRoutes(reg *cookoo.Registry)"
+// packname is used to construct the package. "foo" becomes "package foo"
+func NewSerializer(name, packname string, out io.Writer, reg Registry) *Serializer {
+	s := &Serializer{name: name, out: out, reg: reg, packageName: packname}
 	s.compile()
 
 	return s
@@ -54,7 +59,7 @@ func (s *Serializer) Write() error {
 	cxt := &serializerContext {
 		Name: s.name,
 		Registry: s.reg,
-		Package: "routes",
+		Package: s.packageName,
 	}
 	return s.tpl.Execute(s.out, cxt)
 }

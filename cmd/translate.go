@@ -23,6 +23,7 @@ func Translate(c cookoo.Context, p *cookoo.Params) (interface{}, cookoo.Interrup
 	created := []string{}
 	for _, fname := range files {
 		basedir := path.Dir(fname)
+		pkgname := path.Base(basedir)
 		basename := strings.TrimSuffix(path.Base(fname), ".codl")
 		newname := path.Join(basedir, basename + ".go")
 
@@ -37,7 +38,7 @@ func Translate(c cookoo.Context, p *cookoo.Params) (interface{}, cookoo.Interrup
 			return created, err
 		}
 
-		if err := translate(basename, input, output); err != nil {
+		if err := translate(basename, pkgname, input, output); err != nil {
 			return created, fmt.Errorf("Fatal error in %s: %s", fname, err)
 		}
 
@@ -47,14 +48,14 @@ func Translate(c cookoo.Context, p *cookoo.Params) (interface{}, cookoo.Interrup
 	return created, nil
 }
 
-func translate(basename string, in io.Reader, out io.Writer) error {
+func translate(basename, pkgname string, in io.Reader, out io.Writer) error {
 	h, err := parser.Parse(in)
 	if err != nil {
 		return err
 	}
 
 	reg := h.(parser.Registry)
-	ser := parser.NewSerializer(basename, out, reg)
+	ser := parser.NewSerializer(basename, pkgname, out, reg)
 	if err := ser.Write(); err != nil {
 		return err
 	}

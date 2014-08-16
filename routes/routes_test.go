@@ -44,7 +44,7 @@ func TestRoutes(t *testing.T) {
 		var gosrc bytes.Buffer
 
 		reg := h.(parser.Registry)
-		ser := parser.NewSerializer(outbase, &gosrc, reg)
+		ser := parser.NewSerializer(outbase, "routes", &gosrc, reg)
 		if err := ser.Write(); err != nil {
 			t.Errorf("Failed to serialize: %s", err)
 		}
