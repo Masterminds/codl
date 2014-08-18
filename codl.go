@@ -5,8 +5,6 @@ import (
 	"github.com/Masterminds/cookoo/cli"
 	"github.com/Masterminds/codl/routes"
 	//"github.com/Masterminds/codl/parser"
-	"path/filepath"
-	"strings"
 	"flag"
 	"fmt"
 	"os"
@@ -28,6 +26,9 @@ func main() {
 	flags := flag.NewFlagSet("global", flag.PanicOnError)
 	flags.Bool("h", false, "Show help text and exit.")
 
+	// Used by repeat.
+	cxt.Put("router", router)
+
 	routes.AppRoutes(reg)
 
 	err := cli.New(reg, router, cxt).Help(Summary, Description, flags).RunSubcommand()
@@ -36,18 +37,4 @@ func main() {
 		os.Exit(1)
 	}
 
-}
-
-func startup(c cookoo.Context, p *cookoo.Params) (interface{}, cookoo.Interrupt) {
-
-
-	files := os.Args[1:]
-	for _, f := range files {
-		p, _ := filepath.Abs(f)
-		dir := filepath.Dir(p)
-		name := strings.TrimSuffix(filepath.Base(p), ".codl")
-		fmt.Printf("Got %s %s %s\n", dir, p, name)
-	}
-
-	return nil, nil
 }

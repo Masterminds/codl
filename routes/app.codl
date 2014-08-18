@@ -1,8 +1,39 @@
 // The main codl routes for codl.
 IMPORT
+  github.com/Masterminds/cookoo/cli
   github.com/Masterminds/codl/cmd
+  time
 
 ROUTE build "Build all CODL files in the given directory"
+  DOES cli.ParseArgs build.Args
+    USING subcommand «true»
+    USING args FROM cxt:runner.Args
+    USING flagset «buildFlags»
+  DOES cli.ShowHelp help
+    USING show FROM cxt:h
+    USING summary "Transform CODL files into Go source."
+    USING flags «buildFlags»
+
+// Used for watch route.
+ROUTE @watch "Internals for watching CODL files for changes."
   DOES cmd.FindCodl files
-  DOES cmd.Translate created
+    USING dir FROM cxt:d
+  DOES cmd.FilterUnchanged modified
     USING files FROM cxt:files
+    USING since FROM cxt:lastChanged
+  DOES cmd.Translate created
+    USING files FROM cxt:modified
+    USING skipEmpty `true`
+
+ROUTE watch "Watch all files in a directory for changes."
+  DOES cli.ParseArgs build.Args
+    USING subcommand «true»
+    USING args FROM cxt:runner.Args
+    USING flagset «buildFlags»
+  DOES cli.ShowHelp help
+    USING show FROM cxt:h
+    USING summary "Watch CODL files and transform them to Go when they are modified."
+    USING flags «buildFlags»
+  DOES cmd.Repeat lastChanged
+    USING route @watch
+    USING period `time.Second * 30`

@@ -14,8 +14,15 @@ const ExitNoFiles = 2
 
 func Translate(c cookoo.Context, p *cookoo.Params) (interface{}, cookoo.Interrupt) {
 	files := p.Get("files", []string{}).([]string)
+	skipEmpty := p.Get("skipEmpty", false).(bool)
 
 	if len(files) == 0 {
+		// If the list of files is empty, just silently return. This is to
+		// support watching files.
+		if skipEmpty {
+			fmt.Printf("\t\tno changes\n")
+			return []string{}, nil
+		}
 		fmt.Fprintf(os.Stderr, "No CODL files found. Quitting.\n")
 		os.Exit(ExitNoFiles)
 	}
@@ -41,6 +48,8 @@ func Translate(c cookoo.Context, p *cookoo.Params) (interface{}, cookoo.Interrup
 		if err := translate(basename, pkgname, input, output); err != nil {
 			return created, fmt.Errorf("Fatal error in %s: %s", fname, err)
 		}
+
+		fmt.Printf("[INFO] Translated %s to %s\n", fname, newname)
 
 		created = append(created, newname)
 	}

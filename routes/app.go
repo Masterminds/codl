@@ -4,15 +4,45 @@ package routes
 
 import (
 	"github.com/Masterminds/cookoo"
+	`github.com/Masterminds/cookoo/cli`
 	`github.com/Masterminds/codl/cmd`
+	`time`
 	
 )
 
 func AppRoutes(reg *cookoo.Registry) {
 	reg.Route(`build`, `Build all CODL files in the given directory`).
+		Does(cli.ParseArgs, `build.Args`).
+			Using(`subcommand`).WithDefault(true).
+			Using(`args`).From(`cxt:runner.Args`).
+			Using(`flagset`).WithDefault(buildFlags).
+		Does(cli.ShowHelp, `help`).
+			Using(`show`).From(`cxt:h`).
+			Using(`summary`).WithDefault(`Transform CODL files into Go source.`).
+			Using(`flags`).WithDefault(buildFlags)
+
+	reg.Route(`@watch`, `Internals for watching CODL files for changes.`).
 		Does(cmd.FindCodl, `files`).
+			Using(`dir`).From(`cxt:d`).
+		Does(cmd.FilterUnchanged, `modified`).
+			Using(`files`).From(`cxt:files`).
+			Using(`since`).From(`cxt:lastChanged`).
 		Does(cmd.Translate, `created`).
-			Using(`files`).From(`cxt:files`)
+			Using(`files`).From(`cxt:modified`).
+			Using(`skipEmpty`).WithDefault(true)
+
+	reg.Route(`watch`, `Watch all files in a directory for changes.`).
+		Does(cli.ParseArgs, `build.Args`).
+			Using(`subcommand`).WithDefault(true).
+			Using(`args`).From(`cxt:runner.Args`).
+			Using(`flagset`).WithDefault(buildFlags).
+		Does(cli.ShowHelp, `help`).
+			Using(`show`).From(`cxt:h`).
+			Using(`summary`).WithDefault(`Watch CODL files and transform them to Go when they are modified.`).
+			Using(`flags`).WithDefault(buildFlags).
+		Does(cmd.Repeat, `lastChanged`).
+			Using(`route`).WithDefault(`@watch`).
+			Using(`period`).WithDefault(time.Second * 30)
 
 	
 }

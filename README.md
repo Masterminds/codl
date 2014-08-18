@@ -33,7 +33,12 @@ $ glide install && glide in
 ```
 $ codl help  # Show help text
 $ codl build # Transform all *.codl files into *.go files
+$ codl watch # Watch a directory for changes to any *codl files, and
+             # compile any found changes.
 ```
+
+The `-d DIRECTORY` flag can be used with `build` or `watch` to point
+them to a particular directory.
 
 ## Syntax
 
