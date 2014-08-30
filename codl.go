@@ -19,6 +19,14 @@ Commands:
 
 - help: Show help text and exit.
 - build: Convert ".codl" files to ".go" files.
+- watch: Watch all .codl files in a directory for changes, and transform them.
+
+Examples:
+
+$ codl build -d routes/   # Convert all .codl files in routes/
+$ codl watch -d routes/   # Watch routes/ for changed .codl files.
+$ codl -h                 # Show global help.
+$ codl watch -h           # Show help for the 'codl watch' command.
 `
 
 func main() {
