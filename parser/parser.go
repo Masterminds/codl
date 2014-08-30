@@ -17,7 +17,8 @@ const (
 )
 
 const (
-	cmdInclude = iota
+	cmdCommand = iota
+	cmdInclude
 	cmdDoes
 )
 
@@ -31,6 +32,10 @@ type Command struct {
 	Name, Cmd string
 	Params []*Using
 	currentParam *Using
+}
+
+func (c *Command) IsIncludes() bool {
+	return c.cmdType == cmdInclude
 }
 
 type Route struct {

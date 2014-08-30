@@ -29,8 +29,8 @@ type Tokenizer struct {
 }
 
 func (z *Tokenizer) Next() {
-	z.consumeSpace()
-	z.consumeComment()
+	// Consume any mixture of comments and spaces.
+	for z.consumeSpace() || z.consumeComment() {}
 
 	b, _, err := z.input.ReadRune()
 	if err != nil {
@@ -230,26 +230,33 @@ func (z *Tokenizer) bareword(prepend []rune) {
 	z.event.Strval(string(buf))
 }
 
-func (z *Tokenizer) consumeSpace() {
+func (z *Tokenizer) consumeSpace() bool {
 	r, _, err := z.input.ReadRune()
+	consumed := false
 	for {
 		if err != nil {
 			z.event.Error(err)
-			return
+			return consumed
 		} else if !unicode.IsSpace(r) {
 			z.input.UnreadRune()
-			return
+			return consumed
 		}
+		consumed = true
 		r, _, err = z.input.ReadRune()
 	}
+	return consumed
 }
 
-func (z *Tokenizer) consumeComment() {
+func (z *Tokenizer) consumeComment() bool {
 	cmt, err := z.input.Peek(2)
 	if err == nil && string(cmt) == "//" {
-		_, err = z.input.ReadString('\n')
+		var comment string
+		comment, err = z.input.ReadString('\n')
+		println(comment)
+		return len(comment) > 0
 	}
-	z.consumeSpace()
+	//z.consumeSpace()
+	return false
 }
 
 func (z *Tokenizer) imports() {

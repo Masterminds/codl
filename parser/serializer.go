@@ -18,9 +18,9 @@ import (
 
 func {{.Name | title }}Routes(reg *cookoo.Registry) {
 	{{range .Registry.Routes}}reg.Route({{.Name}}, {{.Description}}){{range .Commands}}.
-		Does({{.Cmd}}, {{.Name}}){{range .Params}}.
-			Using({{.Name}}){{if .DefaultVal}}.WithDefault({{.DefaultVal}}){{end}}{{if .From}}.From({{.From | join ", "}}){{end}}{{end}}{{end}}
-
+{{if .IsIncludes }}	Includes({{.Name}})
+{{else}}	Does({{.Cmd}}, {{.Name}}){{range .Params}}.
+			Using({{.Name}}){{if .DefaultVal}}.WithDefault({{.DefaultVal}}){{end}}{{if .From}}.From({{.From | join ", "}}){{end}}{{end}}{{end}}{{end}}
 	{{end}}
 }
 `
