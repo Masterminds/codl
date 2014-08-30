@@ -55,8 +55,10 @@ ROUTE "test" "This is a test route."
     USING p2 `1` FROM cxt:p2
   DOES cli.ParseArgs "CMD"
 
+// This is a comment.
 ROUTE "foo" "This is another route"
   DOES web.Flush cmd3
+  INCLUDES "test"
 ```
 
 

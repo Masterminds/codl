@@ -3,6 +3,7 @@ IMPORT
   github.com/Masterminds/cookoo/cli
   github.com/Masterminds/codl/cmd
 
+// Used by watch.
 ROUTE @update "Updates all given CODL files"
   DOES cmd.Translate created
     USING files FROM cxt:files
