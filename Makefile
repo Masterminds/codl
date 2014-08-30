@@ -7,7 +7,7 @@ install: build
 	install -d ${DESTDIR}/usr/local/bin/
 	install -m 755 ./codl ${DESTDIR}/usr/local/bin/codl
 
-test:
+test: clean
 	go test ./parser ./routes ./cmd
 
 clean:
