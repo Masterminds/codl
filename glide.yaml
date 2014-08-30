@@ -1,6 +1,7 @@
 package: github.com/Masterminds/codl
 import:
   - package: github.com/Masterminds/sprig
+  - package: gopkg.in/fsnotify.v1
   # Use 'go get' to fetch a package:
   #- package: github.com/Masterminds/cookoo
   # Get and manage a package with Git:

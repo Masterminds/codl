@@ -252,7 +252,6 @@ func (z *Tokenizer) consumeComment() bool {
 	if err == nil && string(cmt) == "//" {
 		var comment string
 		comment, err = z.input.ReadString('\n')
-		println(comment)
 		return len(comment) > 0
 	}
 	//z.consumeSpace()
