@@ -24,7 +24,8 @@ ROUTE build "Build all CODL files in the given directory"
   //  USING files FROM cxt:files
   //  USING since FROM cxt:lastChanged
   DOES cmd.Translate created
-    USING files FROM cxt:modified
+    //USING files FROM cxt:modified
+    USING files FROM cxt:files
     USING skipEmpty `true`
 
 

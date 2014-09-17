@@ -26,7 +26,7 @@ func AppRoutes(reg *cookoo.Registry) {
 	Does(cmd.FindCodl, `files`).
 			Using(`dir`).From(`cxt:d`).
 	Does(cmd.Translate, `created`).
-			Using(`files`).From(`cxt:modified`).
+			Using(`files`).From(`cxt:files`).
 			Using(`skipEmpty`).WithDefault(true)
 	reg.Route(`watch`, `Watch all files in a directory for changes.`).
 	Does(cli.ParseArgs, `build.Args`).
