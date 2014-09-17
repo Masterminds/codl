@@ -20,9 +20,9 @@ ROUTE build "Build all CODL files in the given directory"
     USING flags «buildFlags»
   DOES cmd.FindCodl files
     USING dir FROM cxt:d
-  DOES cmd.FilterUnchanged modified
-    USING files FROM cxt:files
-    USING since FROM cxt:lastChanged
+  //DOES cmd.FilterUnchanged modified
+  //  USING files FROM cxt:files
+  //  USING since FROM cxt:lastChanged
   DOES cmd.Translate created
     USING files FROM cxt:modified
     USING skipEmpty `true`
@@ -39,3 +39,7 @@ ROUTE watch "Watch all files in a directory for changes."
     USING flags «buildFlags»
   DOES cmd.Watch watch
     USING dir FROM cxt:d
+
+ROUTE version "Print version and exit"
+  DOES cmd.Version ver
+    USING version FROM cxt:version

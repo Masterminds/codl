@@ -25,9 +25,6 @@ func AppRoutes(reg *cookoo.Registry) {
 			Using(`flags`).WithDefault(buildFlags).
 	Does(cmd.FindCodl, `files`).
 			Using(`dir`).From(`cxt:d`).
-	Does(cmd.FilterUnchanged, `modified`).
-			Using(`files`).From(`cxt:files`).
-			Using(`since`).From(`cxt:lastChanged`).
 	Does(cmd.Translate, `created`).
 			Using(`files`).From(`cxt:modified`).
 			Using(`skipEmpty`).WithDefault(true)
@@ -42,5 +39,8 @@ func AppRoutes(reg *cookoo.Registry) {
 			Using(`flags`).WithDefault(buildFlags).
 	Does(cmd.Watch, `watch`).
 			Using(`dir`).From(`cxt:d`)
+	reg.Route(`version`, `Print version and exit`).
+	Does(cmd.Version, `ver`).
+			Using(`version`).From(`cxt:version`)
 	
 }

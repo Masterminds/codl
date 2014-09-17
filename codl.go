@@ -36,6 +36,7 @@ func main() {
 
 	// Used by repeat.
 	cxt.Put("router", router)
+	cxt.Put("version", version)
 
 	routes.AppRoutes(reg)
 
