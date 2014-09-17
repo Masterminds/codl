@@ -59,7 +59,8 @@ func Watch(c cookoo.Context, p *cookoo.Params) (interface{}, cookoo.Interrupt) {
 				c.Put("files", []string{good.Name})
 				err := router.HandleRequest(route, c, false)
 				if err != nil {
-					return time.Now(), err
+					fmt.Printf("[ERROR] %s\n", err)
+					//return time.Now(), err
 				}
 				c.Put("lastUpdated", time.Now())
 
